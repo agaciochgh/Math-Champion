@@ -14,7 +14,7 @@ import { ICONS, ringHTML, progressBar, barChart, tile, badgeCard } from './views
 import { reportHTML, settingsHTML } from './views/parent.js';
 import { uid, esc, dayKey, parseKey, addDays, weekStart, clamp, plural, pct, fmtDuration, randInt } from './util.js';
 
-const APP_VERSION = '2026-10-27.2'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
+const APP_VERSION = '2026-10-27.3'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
 const AVATARS = ['🦊', '🐼', '🦄', '🐸', '🐯', '🐙', '🦖', '🐧', '🐨', '🦁', '🐰', '🚀', '🐶', '🐱', '🦋', '🐲', '🌟', '🧚'];
 const COLORS = ['#7c5cff', '#ff5c8a', '#ff8a3d', '#12b886', '#339af0', '#e64980', '#f59f00', '#15aabf'];
 const CHEERS = ['Awesome!', 'Great job!', 'You did it!', 'Way to go!', 'Fantastic!', 'You rock!', 'Brilliant!'];
@@ -336,9 +336,27 @@ function finishPractice(complete) {
   else sounds.finish();
 }
 
+/**
+ * Put `html` (a single outer element) into `root`. If the same screen is already showing (same data-screen),
+ * keep its outer element and only swap its attributes and contents. Re-creating it on every tap would replay
+ * its entry animation, which shows up as a flash on each key press, and would lose the scroll position.
+ * Returns true when the screen was newly opened.
+ */
+function show(root, html) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html.trim();
+  const next = tpl.content.firstElementChild;
+  const cur = root.firstElementChild;
+  if (!cur || !next || cur.dataset.screen !== next.dataset.screen) { root.replaceChildren(tpl.content); return true; }
+  for (const { name } of [...cur.attributes]) if (!next.hasAttribute(name)) cur.removeAttribute(name);
+  for (const { name, value } of next.attributes) if (cur.getAttribute(name) !== value) cur.setAttribute(name, value);
+  cur.replaceChildren(...next.childNodes);
+  return false;
+}
+
 function renderPlay() {
   const root = $('#play-root');
-  if (ui.summary) { root.innerHTML = summaryHTML(); return; }
+  if (ui.summary) { show(root, summaryHTML()); return; }
   const p = ui.play;
   if (!p) { root.innerHTML = ''; return; }
   const k = state.kids.find((x) => x.id === p.kidId);
@@ -358,7 +376,7 @@ function renderPlay() {
   else if (p.combo >= 3) feedback = `<div class="fb combo">🔥 ${p.combo} in a row</div>`;
 
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'back', '0', 'enter'];
-  root.innerHTML = `<div class="play" style="--accent:${k?.color || '#7c5cff'};--skill:${sk.color}">
+  show(root, `<div class="play" data-screen="play" style="--accent:${k?.color || '#7c5cff'};--skill:${sk.color}">
     <div class="play-top">
       <button class="icon-btn" data-action="quit" aria-label="Stop">${ICONS.close}</button>
       ${status}
@@ -377,7 +395,7 @@ function renderPlay() {
         ? `<button data-action="play-key" data-key="back" aria-label="Delete">${ICONS.back}</button>`
         : key === 'enter' ? `<button class="go" data-action="play-key" data-key="enter" aria-label="Check answer" ${p.entry ? '' : 'disabled'}>${ICONS.check}</button>`
           : `<button data-action="play-key" data-key="${key}">${key}</button>`).join('')}</div>`}
-  </div>`;
+  </div>`);
 }
 
 function summaryHTML() {
@@ -400,7 +418,7 @@ function summaryHTML() {
       ? `<div class="banner"><div class="b-ic">⭐</div><div>That one counts! <b>${left} more great practice${left === 1 ? '' : 's'}</b> to unlock <b>${esc(sk.levels[st.level + 1].name)}</b>.</div></div>`
       : `<div class="banner soft"><div class="b-ic">🎯</div><div>Get ${Math.round(PASS_ACCURACY * 100)}% right first try in a full practice to earn a ★ towards <b>${esc(sk.levels[st.level + 1].name)}</b>.</div></div>`;
   }
-  return `<div class="play summary" style="--accent:${k?.color || '#7c5cff'}">
+  return `<div class="play summary" data-screen="summary" style="--accent:${k?.color || '#7c5cff'}">
     <div class="sum-inner">
       <div class="sum-big pop">${big}</div>
       <h2>${esc(head)}</h2>
@@ -531,8 +549,10 @@ function renderModal() {
   const m = ui.modal;
   if (!m) { root.innerHTML = ''; return; }
   const html = MODALS[m.type](m);
-  root.innerHTML = `<div class="modal-backdrop" data-action="backdrop"><div class="modal" role="dialog" aria-modal="true"><div class="grip"></div>${html}</div></div>`;
-  root.querySelector('[autofocus]')?.focus();
+  // Keep the backdrop and the pop-up itself while it's open (see show()), so typing a PIN doesn't flash.
+  if (!root.firstElementChild) root.innerHTML = '<div class="modal-backdrop" data-action="backdrop"></div>';
+  const opened = show(root.firstElementChild, `<div class="modal" role="dialog" aria-modal="true" data-screen="${m.type}"><div class="grip"></div>${html}</div>`);
+  if (opened) root.querySelector('[autofocus]')?.focus();
 }
 
 const head = (title) => `<div class="modal-head"><h2>${title}</h2><button class="icon-btn" data-action="close" aria-label="Close">${ICONS.close}</button></div>`;
