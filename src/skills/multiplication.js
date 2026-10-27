@@ -31,8 +31,9 @@ function fact(t, n, rng) {
 }
 
 const levels = [
-  ...STAGES.map((ts) => ({ name: ts.map((t) => `×${t}`).join(' and '), example: `${ts[ts.length - 1]} × 7` })),
-  { name: 'All tables mixed', example: '7 × 8' },
+  // The example shows the whole range, so nobody reads it as "only up to × 7".
+  ...STAGES.map((ts) => ({ name: ts.map((t) => `×${t}`).join(' and '), example: `${ts[0]} × 0 to ${ts[ts.length - 1]} × 12` })),
+  { name: 'All tables mixed', example: '0 × 0 to 12 × 12' },
 ];
 
 export default {

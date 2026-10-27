@@ -46,6 +46,15 @@ test('multiplication focuses on the current table, with some review, all within 
   }
 });
 
+test('every times-table level goes all the way up to × 12, and says so', () => {
+  const mult = skillById('mult');
+  STAGES.forEach((ts, level) => {
+    const partners = new Set(many(mult, level).filter((p) => ts.includes(p.table)).map((p) => (p.a === p.table ? p.b : p.a)));
+    assert.deepEqual([...partners].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], `level ${level + 1}`);
+    assert.match(mult.levels[level].example, /× 12$/);
+  });
+});
+
 test('picked tables are respected, and missed facts come up more', () => {
   const mult = skillById('mult');
   for (const p of many(mult, 0, { tables: [7, 8] })) assert.ok([7, 8].includes(p.table), p.text);

@@ -14,7 +14,7 @@ import { ICONS, ringHTML, progressBar, barChart, tile, badgeCard } from './views
 import { reportHTML, settingsHTML } from './views/parent.js';
 import { uid, esc, dayKey, parseKey, addDays, weekStart, clamp, plural, pct, fmtDuration, randInt } from './util.js';
 
-const APP_VERSION = '2026-10-27.1'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
+const APP_VERSION = '2026-10-27.2'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
 const AVATARS = ['🦊', '🐼', '🦄', '🐸', '🐯', '🐙', '🦖', '🐧', '🐨', '🦁', '🐰', '🚀', '🐶', '🐱', '🦋', '🐲', '🌟', '🧚'];
 const COLORS = ['#7c5cff', '#ff5c8a', '#ff8a3d', '#12b886', '#339af0', '#e64980', '#f59f00', '#15aabf'];
 const CHEERS = ['Awesome!', 'Great job!', 'You did it!', 'Way to go!', 'Fantastic!', 'You rock!', 'Brilliant!'];

@@ -1,5 +1,5 @@
 // Offline support: fetch fresh files when online, fall back to the cached copy when offline.
-const CACHE = 'math-champion-v2';
+const CACHE = 'math-champion-v3';
 const SHELL = [
   './', 'index.html', 'styles.css', 'sync-config.js', 'icon.svg', 'manifest.webmanifest',
   'src/app.js', 'src/util.js', 'src/progress.js', 'src/store.js', 'src/sync.js', 'src/sound.js',
