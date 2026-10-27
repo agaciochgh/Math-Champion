@@ -1,6 +1,6 @@
 /* The skill registry: every kind of practice the app offers.
  *
- * To add new content, write a module like addition.js and list it here. A skill is:
+ * To add new content, write a module like multiplication.js and list it here. A skill is:
  *   id        short, stable string. It is stored in saved sessions, so never rename it.
  *   name, icon, color
  *   levels    [{ name, example }] in teaching order. Kids move up after passing sessions (see progress.js).
@@ -11,10 +11,10 @@
  *
  * New skills are switched on for every kid automatically; parents can switch them off per kid.
  */
-import addition from './addition.js';
-import subtraction from './subtraction.js';
 import multiplication from './multiplication.js';
 
-export const SKILLS = [addition, subtraction, multiplication];
+// Addition and subtraction were taken out on 2026-10-27 to focus on times tables. They're in git history
+// (commit de32247) if they're wanted back; re-adding them with ids 'add' and 'sub' revives saved levels too.
+export const SKILLS = [multiplication];
 export const skillById = (id) => SKILLS.find((s) => s.id === id) || null;
 export const topLevel = (skill) => skill.levels.length - 1;

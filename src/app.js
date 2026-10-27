@@ -14,7 +14,7 @@ import { ICONS, ringHTML, progressBar, barChart, tile, badgeCard } from './views
 import { reportHTML, settingsHTML } from './views/parent.js';
 import { uid, esc, dayKey, parseKey, addDays, weekStart, clamp, plural, pct, fmtDuration, randInt } from './util.js';
 
-const APP_VERSION = '2026-10-05.1'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
+const APP_VERSION = '2026-10-27.1'; // bump with each release (and CACHE in sw.js) so parents can see which version a device runs
 const AVATARS = ['🦊', '🐼', '🦄', '🐸', '🐯', '🐙', '🦖', '🐧', '🐨', '🦁', '🐰', '🚀', '🐶', '🐱', '🦋', '🐲', '🌟', '🧚'];
 const COLORS = ['#7c5cff', '#ff5c8a', '#ff8a3d', '#12b886', '#339af0', '#e64980', '#f59f00', '#15aabf'];
 const CHEERS = ['Awesome!', 'Great job!', 'You did it!', 'Way to go!', 'Fantastic!', 'You rock!', 'Brilliant!'];
@@ -87,7 +87,7 @@ function welcomeHTML() {
   return `<div class="welcome"><div class="inner">
     <img class="logo" src="icon.svg" alt="" />
     <h1>Math Champion</h1>
-    <p class="lead">Quick daily practice for adding, subtracting and times tables. Level up, earn badges and keep your streak going!</p>
+    <p class="lead">Quick daily times-tables practice. Level up, earn badges and keep your streak going!</p>
     <button class="btn btn-primary btn-block" data-action="add-kid">Let's get started</button>
     ${Sync.enabled ? `<button class="btn btn-soft btn-block" style="margin-top:12px" data-action="sync-open">Sign in to your family account</button>` : ''}
   </div></div>`;
@@ -585,9 +585,9 @@ const MODALS = {
         ${goal('dailyGoal', 'Daily goal', 'min', [5, 10, 15])}
         ${goal('weeklyGoal', 'Weekly goal', 'min', [20, 30, 45, 60])}
         <div class="field"><span class="label">Problems per practice</span><div class="choices">${[10, 15, 20, 30].map((v) => `<button type="button" class="choice ${Number(d.sessionLength) === v ? 'on' : ''}" data-action="draft" data-key="sessionLength" data-val="${v}">${v}</button>`).join('')}</div></div>
-        <div class="field"><span class="label">Skills and levels</span>
+        <div class="field"><span class="label">${SKILLS.length > 1 ? 'Skills and levels' : 'Level'}</span>
           ${SKILLS.map((sk) => `<div class="skill-set">
-            <label class="check"><input type="checkbox" name="skill-${sk.id}" ${d.disabledSkills.includes(sk.id) ? '' : 'checked'} /> ${sk.icon} ${esc(sk.name)}</label>
+            ${SKILLS.length > 1 ? `<label class="check"><input type="checkbox" name="skill-${sk.id}" ${d.disabledSkills.includes(sk.id) ? '' : 'checked'} /> ${sk.icon} ${esc(sk.name)}</label>` : ''}
             <select class="input" name="level-${sk.id}" aria-label="${esc(sk.name)} level">${sk.levels.map((lv, i) => `<option value="${i}" ${d.levels[sk.id] === i ? 'selected' : ''}>Level ${i + 1}: ${esc(lv.name)} (${esc(lv.example)})</option>`).join('')}</select>
           </div>`).join('')}
           <p class="hint">Kids move up by themselves after ${PASSES_TO_LEVEL_UP} practices with ${Math.round(PASS_ACCURACY * 100)}%+ right first try. Change a level here to skip ahead or go back.</p>
@@ -630,7 +630,8 @@ function readKidForm() {
   d.name = f.elements.name.value;
   d.dailyGoal = f.elements.dailyGoal.value;
   d.weeklyGoal = f.elements.weeklyGoal.value;
-  d.disabledSkills = SKILLS.filter((sk) => !f.elements[`skill-${sk.id}`].checked).map((sk) => sk.id);
+  // With only one skill there's no on/off switch, and it's always on.
+  d.disabledSkills = SKILLS.length > 1 ? SKILLS.filter((sk) => !f.elements[`skill-${sk.id}`].checked).map((sk) => sk.id) : [];
   for (const sk of SKILLS) d.levels[sk.id] = Number(f.elements[`level-${sk.id}`].value);
 }
 

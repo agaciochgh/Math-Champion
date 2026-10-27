@@ -8,6 +8,8 @@ import {
 import { esc, dayKey, parseKey, addDays, weekStart, fmtDuration, fmtDate, pct, plural } from '../util.js';
 import { barChart, tile } from './common.js';
 
+// Skills that used to exist, so older practice in the history still reads well.
+const RETIRED = { add: { icon: '➕', name: 'Addition' }, sub: { icon: '➖', name: 'Subtraction' } };
 const MODES = { practice: 'Practice', pick: 'Picked tables', challenge: '1-minute challenge' };
 const accText = (acc) => (acc == null ? '–' : `${Math.round(acc * 100)}%`);
 const accClass = (acc) => (acc == null ? '' : acc >= PASS_ACCURACY ? 'good' : acc >= 0.7 ? 'ok' : 'low');
@@ -58,7 +60,6 @@ export function reportHTML(state, kid, ui, today = dayKey()) {
     </div>
 
     ${multReport(sessions, today, kid)}
-    ${missedReport(sessions, kid)}
 
     <div class="card">
       <h3 class="card-title">Recent practice</h3>
@@ -111,25 +112,10 @@ function multReport(sessions, today, kid) {
   </div>`;
 }
 
-function missedReport(sessions, kid) {
-  const missed = [];
-  for (const s of [...sessions].reverse()) {
-    if (s.skill === 'mult') continue;
-    for (const p of s.problems) if (p.tries[0] !== p.ans) missed.push({ ...p, skill: s.skill, date: s.date });
-    if (missed.length >= 12) break;
-  }
-  if (!missed.length) return '';
-  return `<div class="card">
-    <h3 class="card-title">Recent addition & subtraction misses</h3>
-    <div class="chips">${missed.slice(0, 12).map((p) => `<span class="fact-chip" title="${fmtDate(p.date)}">${esc(p.q)} = ${p.ans} <s>${p.tries.filter((t) => t !== p.ans).join(', ')}</s></span>`).join('')}</div>
-    <p class="hint">Struck-through numbers are what ${esc(kid.name)} typed.</p>
-  </div>`;
-}
-
 function sessionRow(s, open, today) {
-  const sk = skillById(s.skill);
+  const sk = skillById(s.skill) || RETIRED[s.skill];
   const title = `${sk?.name || s.skill} · ${s.mode === 'pick' && s.tables ? `×${s.tables.join(', ×')}` : MODES[s.mode] || s.mode}`;
-  const lv = sk && s.mode !== 'pick' ? ` · Level ${s.level + 1}` : '';
+  const lv = sk && s.mode !== 'pick' && !RETIRED[s.skill] ? ` · Level ${s.level + 1}` : '';
   const sub = s.mode === 'challenge' ? `${s.correct} right in a minute` : `${s.firstTry}/${s.total} right first try${s.complete ? '' : ' · stopped early'}`;
   return `<button class="list-item" data-action="toggle-session" data-id="${s.id}" aria-expanded="${open}">
       <div class="dot">${sk?.icon || '🧮'}</div>

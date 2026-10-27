@@ -11,6 +11,7 @@ A no-build static web app (vanilla ES modules) on GitHub Pages, with optional Fi
 
 ## Adding or extending content
 - **New level for an existing skill:** add it at the END of that skill's `levels` array (saved progress refers to levels by index). If the last level is "Mix it up" (`gen: 'mix'`), insert the new level before it and add a migration in `store.js normalize()` that bumps saved levels at or above the insert point.
+- **Times tables only for now.** Addition and subtraction (2-digit ± 2-digit, 5 levels each) were removed at the owner's request on 2026-10-27. Restore `src/skills/addition.js` and `subtraction.js` from commit de32247 and re-register them, keeping the ids `add` and `sub`. Old sessions with those ids stay in kids' history (labelled via `RETIRED` in `src/views/parent.js`).
 - **New skill** (e.g. 3-digit addition, division, missing numbers): create `src/skills/<name>.js` that follows the interface documented in `src/skills/index.js`, then register it in `SKILLS`. It appears for every kid automatically; parents can switch it off per kid. Add generator tests to `tests/skills.test.js`. If it needs a skill badge, add it to `BADGES` in `progress.js`.
 - Never rename a skill `id`: it's stored in saved sessions.
 

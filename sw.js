@@ -1,10 +1,10 @@
 // Offline support: fetch fresh files when online, fall back to the cached copy when offline.
-const CACHE = 'math-champion-v1';
+const CACHE = 'math-champion-v2';
 const SHELL = [
   './', 'index.html', 'styles.css', 'sync-config.js', 'icon.svg', 'manifest.webmanifest',
   'src/app.js', 'src/util.js', 'src/progress.js', 'src/store.js', 'src/sync.js', 'src/sound.js',
   'src/views/common.js', 'src/views/parent.js',
-  'src/skills/index.js', 'src/skills/common.js', 'src/skills/addition.js', 'src/skills/subtraction.js', 'src/skills/multiplication.js',
+  'src/skills/index.js', 'src/skills/common.js', 'src/skills/multiplication.js',
 ];
 
 self.addEventListener('install', (e) => {

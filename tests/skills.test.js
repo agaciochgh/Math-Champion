@@ -4,9 +4,14 @@ import { SKILLS, skillById } from '../src/skills/index.js';
 import { STAGES, factKey } from '../src/skills/multiplication.js';
 import { seeded } from '../src/util.js';
 
-const twoDigit = (n) => n >= 10 && n <= 99;
 const many = (skill, level, opts = {}) => skill.problems({ level, count: 20, rng: seeded(level * 7 + 1), ...opts })
   .concat(...Array.from({ length: 40 }, (_, i) => skill.problems({ level, count: 20, rng: seeded(1000 + i + level), ...opts })));
+
+test('multiplication is the only skill for now', () => {
+  assert.deepEqual(SKILLS.map((s) => s.id), ['mult']);
+  assert.equal(skillById('add'), null);
+  assert.equal(skillById('sub'), null);
+});
 
 test('every skill makes correct, well-formed problems at every level', () => {
   for (const skill of SKILLS) {
@@ -23,35 +28,6 @@ test('every skill makes correct, well-formed problems at every level', () => {
       }
       for (let i = 1; i < ps.length; i++) assert.notEqual(ps[i].text, ps[i - 1].text, 'no immediate repeats');
     });
-  }
-});
-
-test('addition levels stick to 2-digit + 2-digit and their rules', () => {
-  const add = skillById('add');
-  for (const level of [0, 1, 2, 3, 4]) {
-    for (const p of many(add, level)) {
-      assert.ok(twoDigit(p.a) && twoDigit(p.b), p.text);
-      const carry = (p.a % 10) + (p.b % 10) >= 10;
-      if (level === 0) { assert.ok(p.b % 10 === 0 && p.answer <= 99, p.text); }
-      if (level === 1) { assert.ok(!carry && p.answer <= 99, p.text); }
-      if (level === 2) { assert.ok(carry && p.answer <= 99, p.text); }
-      if (level === 3) { assert.ok(p.answer > 100, p.text); }
-    }
-  }
-});
-
-test('subtraction never goes below zero and follows level rules', () => {
-  const sub = skillById('sub');
-  for (const level of [0, 1, 2, 3, 4]) {
-    for (const p of many(sub, level)) {
-      assert.ok(twoDigit(p.a) && twoDigit(p.b), p.text);
-      assert.ok(p.answer > 0, p.text);
-      const borrow = p.a % 10 < p.b % 10;
-      if (level === 0) assert.equal(p.b % 10, 0, p.text);
-      if (level === 1) assert.ok(!borrow, p.text);
-      if (level === 2) assert.ok(borrow, p.text);
-      if (level === 3) assert.ok([8, 9].includes(p.b % 10), p.text);
-    }
   }
 });
 

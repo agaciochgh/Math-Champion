@@ -239,9 +239,9 @@ export const BADGES = [
   B('speed25', '⚡', 'Lightning', '25 right in a 1-minute challenge', (t) => t.challenge, 25),
   B('time60', '⌛', 'Hour of Power', 'Practise for 60 minutes in all', (t) => t.minutes, 60),
   B('time300', '🕰️', 'Time Master', 'Practise for 5 hours in all', (t) => t.minutes, 300),
-  B('addAce', '➕', 'Addition Ace', 'Reach the top addition level', (t) => t.level('add'), topLevel(skillById('add'))),
-  B('subStar', '➖', 'Subtraction Star', 'Reach the top subtraction level', (t) => t.level('sub'), topLevel(skillById('sub'))),
+  B('mult3', '🌱', 'Table Starter', 'Unlock 3 times-table levels', (t) => t.level('mult') + 1, 3),
   B('mult6', '✖️', 'Halfway Hero', 'Unlock 6 times-table levels', (t) => t.level('mult') + 1, 6),
+  B('mult9', '🧗', 'Almost There', 'Unlock 9 times-table levels', (t) => t.level('mult') + 1, 9),
   B('multAll', '🏆', 'Times Table Champion', 'Unlock every times table', (t) => t.level('mult'), topLevel(skillById('mult'))),
 ];
 

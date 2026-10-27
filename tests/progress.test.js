@@ -9,7 +9,7 @@ const prob = (ans, tries, ms = 5000, k = 'x') => ({ q: '?', k, ans, tries, ms })
 const right = (n) => Array.from({ length: n }, () => prob(1, [1]));
 const session = (o = {}) => {
   const problems = o.problems || right(20);
-  return { id: Math.random().toString(36), kidId: 'k', date: '2026-10-05', skill: 'add', mode: 'practice', level: 0, complete: true, ...scoreProblems(problems), problems, ...o };
+  return { id: Math.random().toString(36), kidId: 'k', date: '2026-10-05', skill: 'mult', mode: 'practice', level: 0, complete: true, ...scoreProblems(problems), problems, ...o };
 };
 const kid = { id: 'k', name: 'Test', dailyGoal: 5, weeklyGoal: 20 };
 
@@ -27,10 +27,10 @@ test('two passing sessions at a level move a kid up; misses and other levels do 
   const pass = session();
   assert.ok(isPass(pass));
   let r = advanceSkill(kid, pass);
-  assert.deepEqual(r.kid.skills.add, { level: 0, passes: 1 });
+  assert.deepEqual(r.kid.skills.mult, { level: 0, passes: 1 });
   assert.equal(r.levelUp, null);
   r = advanceSkill(r.kid, pass);
-  assert.deepEqual(r.kid.skills.add, { level: 1, passes: 0 });
+  assert.deepEqual(r.kid.skills.mult, { level: 1, passes: 0 });
   assert.deepEqual(r.levelUp, { from: 0, to: 1 });
 
   const shaky = session({ problems: [...right(17), prob(1, [2, 1]), prob(1, [2, 1]), prob(1, [2, 1])] }); // 85%
@@ -39,8 +39,8 @@ test('two passing sessions at a level move a kid up; misses and other levels do 
   assert.equal(advanceSkill(kid, session({ mode: 'pick' })).kid, kid, 'picked tables do not level up');
   assert.equal(advanceSkill(kid, session({ complete: false })).kid, kid, 'quitting early does not count');
   assert.equal(advanceSkill(kid, session({ level: 3 })).kid, kid, 'a session at another level does not count');
-  const top = { ...kid, skills: { add: { level: 4, passes: 0 } } };
-  assert.equal(advanceSkill(top, session({ level: 4 })).levelUp, null, 'no level above the top');
+  const top = { ...kid, skills: { mult: { level: 12, passes: 0 } } };
+  assert.equal(advanceSkill(top, session({ level: 12 })).levelUp, null, 'no level above the top');
 });
 
 test('XP includes goal bonuses exactly when the goal is crossed', () => {
@@ -84,5 +84,6 @@ test('badges and trouble facts', () => {
   const stats = factStats(sessions);
   assert.deepEqual(stats['7×8'], { n: 2, wrong: 2, ms: 10000 });
   assert.deepEqual(troubleFacts(stats).map((f) => f.key), ['7×8']);
+  assert.ok(!b.some((x) => x.id === 'addAce' || x.id === 'subStar'), 'no addition or subtraction badges');
   assert.deepEqual(unlockedTables({ skills: { mult: { level: 2 } } }), [0, 1, 2, 10]);
 });
